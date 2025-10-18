@@ -4,7 +4,7 @@ using System.Text.Json;
 namespace DynamicProfileAPI.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("[controller]")]
     public class ProfileController : ControllerBase
     {
         private readonly HttpClient _httpClient;
@@ -14,50 +14,42 @@ namespace DynamicProfileAPI.Controllers
             _httpClient = httpClient;
         }
 
-        [HttpGet("/me")]
-
-
+        [HttpGet("me")]
+        [Produces("application/json")]
         public async Task<IActionResult> GetProfile()
         {
             try
             {
-
                 var response = await _httpClient.GetStringAsync("https://catfact.ninja/fact");
-
                 var json = JsonDocument.Parse(response);
-
                 var catFact = json.RootElement.GetProperty("fact").GetString();
-
 
                 var result = new
                 {
                     status = "success",
 
-                    User = new
+                    user = new
                     {
-                        Email = "oshinkoyamasturah@gmail.com",
-                        Name = "Masturah Oshinkoya",
-
-                        Stack = "C#/ASP.NET Core"
+                       
+                        email = "oshinkoyamasturah@gmail.com",
+                        name = "Masturah Abiodun Oshinkoya",
+                        stack = "C#/ASP.NET Core"
                     },
                     timestamp = DateTime.UtcNow.ToString("o"),
                     fact = catFact
-                    
                 };
 
-                return new ContentResult
+                return new JsonResult(result)
                 {
-                    Content = JsonSerializer.Serialize(result),
-                    ContentType = "application/json",
-                    StatusCode = 200
+                    StatusCode = 200,
+                    ContentType = "application/json"
                 };
-
             }
             catch (Exception ex)
             {
                 return StatusCode(500, new
                 {
-                    status = "error",
+                    error = "Unable to fetch cat fact",
                     message = ex.Message
                 });
             }
